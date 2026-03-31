@@ -15,10 +15,10 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('auth:api')->group(function () {
-    Route::get('/conversations', [ConversationController::class, 'index']);
-    Route::get('/conversations/{conversation}', [ConversationController::class, 'show']);
-    Route::post('/conversations', [ConversationController::class, 'store']);
-    Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store']);
     Route::get('/conversations/unread-count', [ConversationController::class, 'unreadCount']);
+    Route::get('/conversations', [ConversationController::class, 'index']);
+    Route::post('/conversations', [ConversationController::class, 'store']);
     Route::patch('/conversations/{conversation}/read', [ConversationController::class, 'markAsRead']);
+    Route::get('/conversations/{conversation}', [ConversationController::class, 'show']);
+    Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store']);
 });

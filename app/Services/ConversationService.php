@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Services;
 
 use App\Models\Conversation;
+use App\Models\ConversationParticipant;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
@@ -83,7 +83,6 @@ class ConversationService
             ]);
         });
     }
-    use App\Models\ConversationParticipant;
 
     public function getUnreadCount(int $userId): int
     {
@@ -106,7 +105,7 @@ class ConversationService
 
         return $totalUnread;
     }
-    
+
     public function markAsRead(int $conversationId, int $userId): void
     {
         $conversation = Conversation::with('messages')
@@ -123,4 +122,5 @@ class ConversationService
             'last_read_message_id' => $lastMessage->id,
         ]);
     }
+
 }

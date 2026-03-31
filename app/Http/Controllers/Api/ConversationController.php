@@ -76,7 +76,7 @@ class ConversationController extends Controller
             ],
         ], 201);
     }
-    
+
     public function unreadCount(): JsonResponse
     {
         $user = request()->user('api');
@@ -87,6 +87,26 @@ class ConversationController extends Controller
             'data' => [
                 'unread_count' => $count,
             ],
+        ]);
+    }
+
+    public function markAsRead(Conversation $conversation): JsonResponse
+    {
+        $user = request()->user('api');
+
+        abort_unless(
+            $conversation->participants()->where('users.id', $user->id)->exists(),
+            403,
+            'You are not allowed to access this conversation.'
+        );
+
+        $this->conversationService->markAsRead(
+            $conversation->id,
+            $user->id
+        );
+
+        return response()->json([
+            'message' => 'Conversation marked as read.',
         ]);
     }
 }
