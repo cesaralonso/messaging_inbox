@@ -13,4 +13,11 @@ class ConversationPolicy
             ->where('users.id', $user->id)
             ->exists();
     }
+
+    public function reply(User $user, Conversation $conversation): bool
+    {
+        return $conversation->participants()
+            ->where('users.id', $user->id)
+            ->exists();
+    }
 }

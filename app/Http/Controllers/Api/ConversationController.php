@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Conversation\IndexConversationRequest;
+use App\Http\Requests\Conversation\StoreConversationRequest;
 use App\Http\Resources\ConversationDetailResource;
 use App\Http\Resources\ConversationListResource;
 use App\Models\Conversation;
@@ -55,5 +56,24 @@ class ConversationController extends Controller
         return response()->json([
             'data' => new ConversationDetailResource($conversation),
         ]);
+    }
+
+    public function store(StoreConversationRequest $request): JsonResponse
+    {
+        $user = $request->user('api');
+
+        $conversation = $this->conversationService->createConversation(
+            $user->id,
+            $request->validated()
+        );
+
+        return response()->json([
+            'message' => 'Conversation created successfully.',
+            'data' => [
+                'id' => $conversation->id,
+                'subject' => $conversation->subject,
+                'status' => $conversation->status,
+            ],
+        ], 201);
     }
 }

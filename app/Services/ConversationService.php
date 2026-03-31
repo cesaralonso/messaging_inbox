@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Conversation;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class ConversationService
 {
@@ -41,5 +42,45 @@ class ConversationService
                 'messages.user',
             ])
             ->findOrFail($conversationId);
+    }
+
+    public function createConversation(int $authUserId, array $data): Conversation
+    {
+        return DB::transaction(function () use ($authUserId, $data) {
+            $conversation = Conversation::create([
+                'subject' => $data['subject'],
+                'created_by' => $authUserId,
+                'status' => 'open',
+            ]);
+
+            $participantIds = collect($data['participant_ids'])
+                ->push($authUserId)
+                ->unique()
+                ->values();
+
+            $attachData = $participantIds->mapWithKeys(function ($participantId) {
+                return [
+                    $participantId => [
+                        'last_read_message_id' => null,
+                    ],
+                ];
+            })->toArray();
+
+            $conversation->participants()->attach($attachData);
+
+            $firstMessage = $conversation->messages()->create([
+                'user_id' => $authUserId,
+                'body' => $data['message'],
+            ]);
+
+            $conversation->participants()->updateExistingPivot($authUserId, [
+                'last_read_message_id' => $firstMessage->id,
+            ]);
+
+            return $conversation->load([
+                'participants',
+                'messages.user',
+            ]);
+        });
     }
 }
