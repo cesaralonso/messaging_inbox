@@ -19,4 +19,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/conversations/{conversation}', [ConversationController::class, 'show']);
     Route::post('/conversations', [ConversationController::class, 'store']);
     Route::post('/conversations/{conversation}/messages', [MessageController::class, 'store']);
+    Route::get('/conversations/unread-count', [ConversationController::class, 'unreadCount']);
+    Route::patch('/conversations/{conversation}/read', [ConversationController::class, 'markAsRead']);
 });

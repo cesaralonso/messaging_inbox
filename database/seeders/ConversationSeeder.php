@@ -10,7 +10,7 @@ class ConversationSeeder extends Seeder
 {
     public function run(): void
     {
-        $john = User::where('email', 'john@example.com')->first();
+        $john = User::where('email', 'admin@messaging-inbox.com')->first();
         $ana = User::where('email', 'ana@example.com')->first();
         $support = User::where('email', 'soporte@example.com')->first();
 

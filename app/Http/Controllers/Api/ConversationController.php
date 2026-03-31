@@ -76,4 +76,17 @@ class ConversationController extends Controller
             ],
         ], 201);
     }
+    
+    public function unreadCount(): JsonResponse
+    {
+        $user = request()->user('api');
+
+        $count = $this->conversationService->getUnreadCount($user->id);
+
+        return response()->json([
+            'data' => [
+                'unread_count' => $count,
+            ],
+        ]);
+    }
 }

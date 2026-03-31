@@ -83,4 +83,44 @@ class ConversationService
             ]);
         });
     }
+    use App\Models\ConversationParticipant;
+
+    public function getUnreadCount(int $userId): int
+    {
+        $participants = ConversationParticipant::with(['conversation.messages'])
+            ->where('user_id', $userId)
+            ->get();
+
+        $totalUnread = 0;
+
+        foreach ($participants as $participant) {
+            $lastReadId = $participant->last_read_message_id ?? 0;
+
+            $unread = $participant->conversation->messages
+                ->where('id', '>', $lastReadId)
+                ->where('user_id', '!=', $userId)
+                ->count();
+
+            $totalUnread += $unread;
+        }
+
+        return $totalUnread;
+    }
+    
+    public function markAsRead(int $conversationId, int $userId): void
+    {
+        $conversation = Conversation::with('messages')
+            ->forUser($userId)
+            ->findOrFail($conversationId);
+
+        $lastMessage = $conversation->messages->sortByDesc('id')->first();
+
+        if (! $lastMessage) {
+            return;
+        }
+
+        $conversation->participants()->updateExistingPivot($userId, [
+            'last_read_message_id' => $lastMessage->id,
+        ]);
+    }
 }

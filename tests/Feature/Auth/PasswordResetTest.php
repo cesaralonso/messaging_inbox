@@ -86,8 +86,8 @@ class PasswordResetTest extends TestCase
         $response = $this->post(route('password.update'), [
             'token' => 'invalid-token',
             'email' => $user->email,
-            'password' => 'newpassword123',
-            'password_confirmation' => 'newpassword123',
+            'password' => 'new123456',
+            'password_confirmation' => 'new123456',
         ]);
 
         $response->assertSessionHasErrors('email');
