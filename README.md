@@ -253,11 +253,30 @@ npm test
 - Login JWT funcional
 - Inbox completamente funcional
 - UI moderna implementada
-- Integración Inertia + Vite estable
+- Integración Inertia con Vite estable
 - Tests ajustados al alcance real
 
 ---
 
-## Autor
 
+## API - Postman
+
+Se incluye una colección de Postman con los endpoints principales del sistema.
+
+Ubicación:
+/postman/Messaging-Inbox-Collection.json
+/postman/Messaging-Inbox-Environment.json
+
+
+### Para usarla:
+
+1. Importar ambos archivos en Postman
+2. Ejecutar primero "Login JWT"
+3. El token se guardará automáticamente
+4. Usar los demás endpoints autenticados
+
+
+
+## Autor
+Ing. César Alonso Magaña Gavilanes
 Desarrollado como práctica técnica full stack.
