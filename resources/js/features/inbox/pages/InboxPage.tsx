@@ -1,5 +1,14 @@
 import { Head } from '@inertiajs/react';
 import { useEffect, useMemo, useState } from 'react';
+import {
+    Search,
+    MailPlus,
+    SendHorizontal,
+    LogOut,
+    Clock3,
+    MailOpen,
+} from 'lucide-react';
+
 import { conversationsApi } from '@/features/inbox/api/conversationsApi';
 import { useApiAuthStore } from '@/features/auth/store/apiAuthStore';
 import { useConversationDetail } from '@/features/inbox/hooks/useConversationDetail';
@@ -7,7 +16,6 @@ import { useConversations } from '@/features/inbox/hooks/useConversations';
 import { useReplyToConversation } from '@/features/inbox/hooks/useReplyToConversation';
 import { useUnreadCount } from '@/features/inbox/hooks/useUnreadCount';
 import InboxShellLayout from '@/layouts/inbox-shell-layout';
-
 
 export default function InboxPage() {
     const hydrateFromStorage = useApiAuthStore((s) => s.hydrateFromStorage);
@@ -60,7 +68,7 @@ export default function InboxPage() {
             await conversationsApi.markAsRead(id);
             await Promise.all([unread.reload(), conversations.reload()]);
         } catch {
-            // el detalle se carga por efecto al cambiar el id seleccionado
+            //
         }
     };
 
@@ -79,206 +87,245 @@ export default function InboxPage() {
         window.location.href = '/api-login';
     };
 
-    if (!hydrated) {
-        return (
-            <>
-                <Head title="Inbox" />
-                <div className="p-6 text-sm text-neutral-500">Cargando sesión API...</div>
-            </>
-        );
-    }
-
-    if (!isAuthenticated) {
-        return (
-        <InboxShellLayout>
-            <>
-                <Head title="Inbox" />
-                <div className="mx-auto max-w-xl p-6">
-                    <div className="rounded-2xl border bg-white p-6 shadow-sm dark:bg-neutral-900">
-                        <h1 className="text-xl font-semibold">Inbox</h1>
-                        <p className="mt-2 text-sm text-neutral-600">
-                            No hay sesión API activa. Primero entra por el login JWT.
-                        </p>
-
-                        <a
-                            href="/api-login"
-                            className="mt-4 inline-block rounded-lg bg-black px-4 py-2 text-sm text-white"
-                        >
-                            Ir a API Login
-                        </a>
-                    </div>
-                </div>
-            </>
-        </InboxShellLayout>
-        );
-    }
-
     return (
-        <>
+        <InboxShellLayout>
             <Head title="Inbox" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 p-4 md:p-6">
-                <div className="flex flex-col gap-3 rounded-2xl border bg-white p-5 shadow-sm dark:bg-neutral-900 md:flex-row md:items-center md:justify-between">
-                    <div>
-                        <p className="text-xs font-medium uppercase tracking-[0.2em] text-neutral-500">
-                            Internal Messaging
-                        </p>
-                        <h1 className="mt-1 text-2xl font-semibold">Inbox</h1>
-                        <p className="mt-1 text-sm text-neutral-500">
-                            {user?.name} · {unread.isLoading ? 'actualizando...' : `${unread.count} no leídos`}
-                        </p>
-                    </div>
+            {!hydrated && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">
+                    Cargando sesión API...
+                </div>
+            )}
 
-                    <button
-                        onClick={handleLogout}
-                        className="rounded-lg border px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800"
+            {hydrated && !isAuthenticated && (
+                <div className="mx-auto max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                    <h1 className="text-xl font-semibold text-slate-900">Inbox</h1>
+                    <p className="mt-2 text-sm text-slate-600">
+                        No hay sesión API activa. Primero entra por el login JWT.
+                    </p>
+
+                    <a
+                        href="/api-login"
+                        className="mt-4 inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
                     >
-                        Cerrar sesión API
-                    </button>
+                        Ir a API Login
+                    </a>
                 </div>
+            )}
 
-                <div className="grid flex-1 gap-4 xl:grid-cols-[380px_minmax(0,1fr)]">
-                    <section className="rounded-2xl border bg-white p-4 shadow-sm dark:bg-neutral-900">
-                        <div className="mb-4 space-y-3">
-                            <input
-                                type="text"
-                                placeholder="Buscar conversación..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="w-full rounded-lg border px-3 py-2 text-sm"
-                            />
+            {hydrated && isAuthenticated && (
+                <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+                    <div className="grid min-h-[740px] grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)]">
+                        <aside className="border-b border-slate-200 bg-slate-50/70 lg:border-b-0 lg:border-r">
+                            <div className="border-b border-slate-200 p-5">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                        <h1 className="text-lg font-semibold text-slate-900">
+                                            Lista de conversaciones
+                                        </h1>
+                                        <p className="mt-1 text-xs text-slate-500">
+                                            {user?.name} · {unread.isLoading ? 'Actualizando...' : `${unread.count} no leídos`}
+                                        </p>
+                                    </div>
 
-                            <div className="text-xs text-neutral-500">
-                                {conversations.meta ? `${conversations.meta.total} conversaciones` : 'Sin datos'}
-                            </div>
-                        </div>
-
-                        {conversations.isLoading && (
-                            <p className="text-sm text-neutral-500">Cargando conversaciones...</p>
-                        )}
-
-                        {conversations.error && (
-                            <p className="text-sm text-red-600">{conversations.error}</p>
-                        )}
-
-                        {!conversations.isLoading && conversations.items.length === 0 && (
-                            <div className="rounded-xl border border-dashed p-6 text-sm text-neutral-500">
-                                No hay conversaciones para mostrar.
-                            </div>
-                        )}
-
-                        <div className="space-y-2">
-                            {conversations.items.map((conversation) => {
-                                const active = conversation.id === selectedConversationId;
-
-                                return (
                                     <button
-                                        key={conversation.id}
-                                        onClick={() => handleSelectConversation(conversation.id)}
-                                        className={[
-                                            'block w-full rounded-xl border p-3 text-left transition',
-                                            active
-                                                ? 'border-neutral-900 bg-neutral-100 dark:border-neutral-200 dark:bg-neutral-800'
-                                                : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/60',
-                                        ].join(' ')}
+                                        type="button"
+                                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white transition hover:bg-slate-800"
+                                        title="Nuevo mensaje"
                                     >
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="min-w-0 flex-1">
-                                                <div className="truncate text-sm font-semibold">
-                                                    {conversation.subject}
-                                                </div>
-                                                <p className="mt-1 line-clamp-2 text-sm text-neutral-600 dark:text-neutral-300">
-                                                    {conversation.last_message?.body ?? 'Sin mensajes'}
-                                                </p>
-                                            </div>
-
-                                            {conversation.unread_count > 0 && (
-                                                <span className="rounded-full bg-black px-2 py-1 text-xs text-white">
-                                                    {conversation.unread_count}
-                                                </span>
-                                            )}
-                                        </div>
+                                        <MailPlus className="h-4 w-4" />
                                     </button>
-                                );
-                            })}
-                        </div>
-                    </section>
-
-                    <section className="flex min-h-[540px] flex-col rounded-2xl border bg-white shadow-sm dark:bg-neutral-900">
-                        {!selectedConversationId && (
-                            <div className="flex flex-1 items-center justify-center p-8 text-sm text-neutral-500">
-                                Selecciona una conversación.
-                            </div>
-                        )}
-
-                        {selectedConversationId && (
-                            <>
-                                <div className="border-b p-5">
-                                    <div className="text-xs uppercase tracking-[0.2em] text-neutral-500">
-                                        Conversación
-                                    </div>
-                                    <h2 className="mt-1 text-xl font-semibold">
-                                        {detail.conversation?.subject ?? selectedConversation?.subject ?? 'Cargando...' }
-                                    </h2>
                                 </div>
 
-                                <div className="flex-1 space-y-3 overflow-y-auto p-5">
-                                    {detail.isLoading && (
-                                        <p className="text-sm text-neutral-500">Cargando detalle...</p>
-                                    )}
-
-                                    {detail.error && (
-                                        <p className="text-sm text-red-600">{detail.error}</p>
-                                    )}
-
-                                    {detail.conversation?.messages.map((message) => (
-                                        <article key={message.id} className="rounded-xl border p-4">
-                                            <div className="mb-1 text-sm font-semibold">
-                                                {message.sender.name}
-                                            </div>
-                                            <p className="text-sm leading-6 text-neutral-700 dark:text-neutral-200">
-                                                {message.body}
-                                            </p>
-                                        </article>
-                                    ))}
-                                </div>
-
-                                <div className="border-t p-5">
-                                    <textarea
-                                        value={replyBody}
-                                        onChange={(e) => setReplyBody(e.target.value)}
-                                        placeholder="Escribe una respuesta..."
-                                        className="min-h-28 w-full rounded-xl border p-3 text-sm"
+                                <div className="relative mt-4">
+                                    <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar conversación..."
+                                        value={search}
+                                        onChange={(e) => setSearch(e.target.value)}
+                                        className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-slate-400"
                                     />
-
-                                    {replyMutation.error && (
-                                        <p className="mt-2 text-sm text-red-600">{replyMutation.error}</p>
-                                    )}
-
-                                    <div className="mt-3 flex justify-end">
-                                        <button
-                                            onClick={handleReply}
-                                            disabled={replyMutation.isSubmitting || !replyBody.trim()}
-                                            className="rounded-lg bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
-                                        >
-                                            {replyMutation.isSubmitting ? 'Enviando...' : 'Responder'}
-                                        </button>
-                                    </div>
                                 </div>
-                            </>
-                        )}
-                    </section>
+                            </div>
+
+                            <div className="max-h-[calc(740px-120px)] space-y-2 overflow-y-auto p-3">
+                                {conversations.isLoading && (
+                                    <p className="px-2 py-3 text-sm text-slate-500">
+                                        Cargando conversaciones...
+                                    </p>
+                                )}
+
+                                {conversations.error && (
+                                    <p className="px-2 py-3 text-sm text-red-600">
+                                        {conversations.error}
+                                    </p>
+                                )}
+
+                                {!conversations.isLoading && conversations.items.length === 0 && (
+                                    <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-4 text-sm text-slate-500">
+                                        No hay conversaciones para mostrar.
+                                    </div>
+                                )}
+
+                                {conversations.items.map((conversation) => {
+                                    const active = conversation.id === selectedConversationId;
+
+                                    return (
+                                        <button
+                                            key={conversation.id}
+                                            onClick={() => handleSelectConversation(conversation.id)}
+                                            className={[
+                                                'block w-full rounded-2xl border p-4 text-left transition',
+                                                active
+                                                    ? 'border-slate-900 bg-slate-900 text-white shadow-sm'
+                                                    : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50',
+                                            ].join(' ')}
+                                        >
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="truncate text-sm font-semibold">
+                                                        {conversation.subject}
+                                                    </div>
+                                                    <div
+                                                        className={[
+                                                            'mt-2 line-clamp-2 text-sm',
+                                                            active ? 'text-slate-200' : 'text-slate-500',
+                                                        ].join(' ')}
+                                                    >
+                                                        {conversation.last_message?.body ?? 'Sin mensajes'}
+                                                    </div>
+                                                </div>
+
+                                                {conversation.unread_count > 0 && (
+                                                    <span
+                                                        className={[
+                                                            'inline-flex min-w-6 items-center justify-center rounded-full px-2 py-1 text-xs font-semibold',
+                                                            active
+                                                                ? 'bg-white text-slate-900'
+                                                                : 'bg-slate-900 text-white',
+                                                        ].join(' ')}
+                                                    >
+                                                        {conversation.unread_count}
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </aside>
+
+                        <section className="flex flex-col">
+                            {!selectedConversationId && (
+                                <div className="flex flex-1 items-center justify-center p-10 text-sm text-slate-500">
+                                    Selecciona una conversación.
+                                </div>
+                            )}
+
+                            {selectedConversationId && (
+                                <>
+                                    <div className="border-b border-slate-200 px-6 py-5">
+                                        <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                                            <div>
+                                                <div className="text-sm font-medium text-slate-500">
+                                                    Área de lectura / redacción
+                                                </div>
+
+                                                <div className="mt-3 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-lg font-semibold text-slate-900">
+                                                    {detail.conversation?.subject ??
+                                                        selectedConversation?.subject ??
+                                                        'Asunto del mensaje'}
+                                                </div>
+
+                                                <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
+                                                    <Clock3 className="h-4 w-4" />
+                                                    <span>[Fecha y hora]</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-2">
+                                                <button
+                                                    type="button"
+                                                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                                                >
+                                                    <MailOpen className="h-4 w-4" />
+                                                    Marcar leído
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    onClick={handleLogout}
+                                                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                                                >
+                                                    <LogOut className="h-4 w-4" />
+                                                    Cerrar sesión
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex-1 space-y-4 overflow-y-auto bg-slate-50/40 px-6 py-6">
+                                        {detail.isLoading && (
+                                            <p className="text-sm text-slate-500">Cargando detalle...</p>
+                                        )}
+
+                                        {detail.error && (
+                                            <p className="text-sm text-red-600">{detail.error}</p>
+                                        )}
+
+                                        {detail.conversation?.messages.map((message) => (
+                                            <article
+                                                key={message.id}
+                                                className="max-w-3xl rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+                                            >
+                                                <div className="mb-2 text-sm font-semibold text-slate-900">
+                                                    {message.sender.name}
+                                                </div>
+                                                <p className="text-sm leading-7 text-slate-700">
+                                                    {message.body}
+                                                </p>
+                                            </article>
+                                        ))}
+                                    </div>
+
+                                    <div className="border-t border-slate-200 bg-white px-6 py-5">
+                                        <div className="mx-auto max-w-4xl">
+                                            <label className="mb-2 block text-sm font-medium text-slate-700">
+                                                Escribir respuesta...
+                                            </label>
+
+                                            <textarea
+                                                value={replyBody}
+                                                onChange={(e) => setReplyBody(e.target.value)}
+                                                placeholder="Redacta tu mensaje..."
+                                                className="min-h-32 w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white"
+                                            />
+
+                                            {replyMutation.error && (
+                                                <p className="mt-2 text-sm text-red-600">
+                                                    {replyMutation.error}
+                                                </p>
+                                            )}
+
+                                            <div className="mt-4 flex justify-end">
+                                                <button
+                                                    onClick={handleReply}
+                                                    disabled={replyMutation.isSubmitting || !replyBody.trim()}
+                                                    className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50"
+                                                >
+                                                    <SendHorizontal className="h-4 w-4" />
+                                                    {replyMutation.isSubmitting ? 'Enviando...' : 'Enviar'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </section>
+                    </div>
                 </div>
-            </div>
-        </>
+            )}
+        </InboxShellLayout>
     );
 }
-
-InboxPage.layout = {
-    breadcrumbs: [
-        {
-            title: 'Inbox',
-            href: '/inbox',
-        },
-    ],
-};

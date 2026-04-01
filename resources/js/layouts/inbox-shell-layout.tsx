@@ -1,72 +1,81 @@
 import { Link, usePage } from '@inertiajs/react';
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
+import { Search, SquarePen, Inbox, KeyRound, LayoutDashboard } from 'lucide-react';
 
 const navItems = [
-    { label: 'Inbox', href: '/inbox' },
-    { label: 'API Login', href: '/api-login' },
-    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Inbox', href: '/inbox', icon: Inbox },
+    { label: 'API Login', href: '/api-login', icon: KeyRound },
 ];
 
 export default function InboxShellLayout({ children }: PropsWithChildren) {
     const page = usePage();
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-zinc-100">
-            <div className="flex min-h-screen">
-                <aside className="hidden w-72 shrink-0 border-r border-zinc-800 bg-zinc-900/70 lg:flex lg:flex-col">
-                    <div className="border-b border-zinc-800 px-6 py-5">
-                        <div className="text-xs uppercase tracking-[0.25em] text-zinc-400">
-                            Messaging Inbox
+        <div className="min-h-screen bg-slate-100 text-slate-900">
+            <div className="mx-auto min-h-screen max-w-7xl bg-white shadow-sm">
+                <header className="border-b border-slate-200">
+                    <div className="flex flex-col gap-4 px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm">
+                                <Inbox className="h-5 w-5" />
+                            </div>
+                            <div>
+                                <div className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                                    Messaging
+                                </div>
+                                <div className="text-2xl font-bold text-slate-900">
+                                    MiInbox
+                                </div>
+                            </div>
                         </div>
-                        <div className="mt-2 text-2xl font-semibold text-white">
-                            Control Panel
+
+                        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+                            <div className="relative min-w-[260px]">
+                                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar..."
+                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-slate-400 focus:bg-white"
+                                />
+                            </div>
+
+                            <button
+                                type="button"
+                                className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800"
+                            >
+                                <SquarePen className="h-4 w-4" />
+                                Nuevo mensaje
+                            </button>
                         </div>
                     </div>
 
-                    <nav className="flex-1 px-4 py-4">
-                        <div className="space-y-2">
+                    <div className="border-t border-slate-100 px-6 py-3">
+                        <nav className="flex flex-wrap gap-2">
                             {navItems.map((item) => {
                                 const active = page.url === item.href || page.url.startsWith(item.href + '/');
+                                const Icon = item.icon;
 
                                 return (
                                     <Link
                                         key={item.href}
                                         href={item.href}
                                         className={[
-                                            'block rounded-xl px-4 py-3 text-sm font-medium transition',
+                                            'inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition',
                                             active
-                                                ? 'bg-white text-zinc-900'
-                                                : 'text-zinc-300 hover:bg-zinc-800 hover:text-white',
+                                                ? 'bg-slate-900 text-white'
+                                                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
                                         ].join(' ')}
                                     >
+                                        <Icon className="h-4 w-4" />
                                         {item.label}
                                     </Link>
                                 );
                             })}
-                        </div>
-                    </nav>
-                </aside>
+                        </nav>
+                    </div>
+                </header>
 
-                <div className="flex min-h-screen min-w-0 flex-1 flex-col">
-                    <header className="border-b border-zinc-800 bg-zinc-950/80 px-4 py-4 lg:px-6">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <div className="text-xs uppercase tracking-[0.25em] text-zinc-500">
-                                    Workspace
-                                </div>
-                                <div className="text-lg font-semibold text-white">
-                                    Messaging Inbox
-                                </div>
-                            </div>
-
-                            <div className="rounded-full border border-zinc-800 bg-zinc-900 px-3 py-1 text-xs text-zinc-400">
-                                {page.url}
-                            </div>
-                        </div>
-                    </header>
-
-                    <main className="min-h-0 flex-1">{children}</main>
-                </div>
+                <main className="p-6">{children}</main>
             </div>
         </div>
     );
