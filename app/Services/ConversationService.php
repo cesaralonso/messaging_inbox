@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Services;
 
 use App\Models\Conversation;
@@ -12,21 +13,35 @@ class ConversationService
         int $userId,
         array $filters = []
     ): LengthAwarePaginator {
-        $perPage = $filters['per_page'] ?? 10;
+        $perPage = (int) ($filters['per_page'] ?? 10);
+        $search = trim((string) ($filters['search'] ?? ''));
+        $status = $filters['status'] ?? null;
 
         return Conversation::query()
             ->forUser($userId)
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($innerQuery) use ($search) {
+                    $innerQuery
+                        ->where('subject', 'like', "%{$search}%")
+                        ->orWhereHas('participants', function ($participantQuery) use ($search) {
+                            $participantQuery
+                                ->where('users.name', 'like', "%{$search}%")
+                                ->orWhere('users.email', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('messages', function ($messageQuery) use ($search) {
+                            $messageQuery->where('body', 'like', "%{$search}%");
+                        });
+                });
+            })
             ->when(
-                ! empty($filters['search']),
-                fn ($query) => $query->where('subject', 'like', '%' . $filters['search'] . '%')
-            )
-            ->when(
-                ! empty($filters['status']),
-                fn ($query) => $query->where('status', $filters['status'])
+                !empty($status),
+                fn ($query) => $query->where('status', $status)
             )
             ->with([
-                'messages.user',
-                'participants',
+                'participants:id,name,email',
+                'messages' => function ($query) {
+                    $query->with('user:id,name,email')->latest('id');
+                },
             ])
             ->latest()
             ->paginate($perPage)
@@ -38,8 +53,10 @@ class ConversationService
         return Conversation::query()
             ->forUser($userId)
             ->with([
-                'participants',
-                'messages.user',
+                'participants:id,name,email',
+                'messages' => function ($query) {
+                    $query->with('user:id,name,email')->oldest('id');
+                },
             ])
             ->findOrFail($conversationId);
     }
@@ -78,8 +95,8 @@ class ConversationService
             ]);
 
             return $conversation->load([
-                'participants',
-                'messages.user',
+                'participants:id,name,email',
+                'messages.user:id,name,email',
             ]);
         });
     }
@@ -114,7 +131,7 @@ class ConversationService
 
         $lastMessage = $conversation->messages->sortByDesc('id')->first();
 
-        if (! $lastMessage) {
+        if (!$lastMessage) {
             return;
         }
 
@@ -122,5 +139,4 @@ class ConversationService
             'last_read_message_id' => $lastMessage->id,
         ]);
     }
-
 }

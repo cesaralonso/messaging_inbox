@@ -28,6 +28,7 @@ export default function InboxPage() {
 
     const [selectedConversationId, setSelectedConversationId] = useState<number | null>(null);
     const [search, setSearch] = useState('');
+    const [status, setStatus] = useState<'open' | 'closed' | ''>('');
     const [replyBody, setReplyBody] = useState('');
 
     const [isComposeOpen, setIsComposeOpen] = useState(false);
@@ -50,6 +51,7 @@ export default function InboxPage() {
     const conversations = useConversations(
         {
             search,
+            status,
             page: 1,
             per_page: 10,
         },
@@ -227,6 +229,17 @@ export default function InboxPage() {
                                             onChange={(e) => setSearch(e.target.value)}
                                             className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm outline-none transition focus:border-slate-400"
                                         />
+                                    </div>
+                                    <div className="mt-3">
+                                        <select
+                                            value={status}
+                                            onChange={(e) => setStatus(e.target.value as 'open' | 'closed' | '')}
+                                            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-slate-400"
+                                        >
+                                            <option value="">Todos los estados</option>
+                                            <option value="open">Abiertas</option>
+                                            <option value="closed">Cerradas</option>
+                                        </select>
                                     </div>
                                 </div>
 

@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use App\Models\ConversationParticipant;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -12,19 +11,15 @@ class ConversationListResource extends JsonResource
     {
         $currentUserId = $request->user('api')->id;
 
-        $participant = ConversationParticipant::query()
-            ->where('conversation_id', $this->id)
-            ->where('user_id', $currentUserId)
-            ->first();
+        $participant = $this->participants->firstWhere('id', $currentUserId);
+        $lastReadMessageId = $participant?->pivot?->last_read_message_id;
 
-        $lastReadMessageId = $participant?->last_read_message_id;
+        $lastMessage = $this->messages->sortByDesc('id')->first();
 
         $unreadCount = $this->messages
             ->where('id', '>', $lastReadMessageId ?? 0)
             ->where('user_id', '!=', $currentUserId)
             ->count();
-
-        $lastMessage = $this->messages->sortByDesc('id')->first();
 
         return [
             'id' => $this->id,
