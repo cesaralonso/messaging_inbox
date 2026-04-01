@@ -119,31 +119,62 @@ describe('InboxPage', () => {
             reload: jest.fn(),
         });
 
-        mockedUseConversationDetail.mockReturnValue({
-            conversation: {
-                id: 1,
-                subject: 'Soporte técnico',
-                status: 'open',
-                participants: [
-                    { id: 1, name: 'César', email: 'cesar@test.com' },
-                    { id: 2, name: 'Ana', email: 'ana@test.com' },
-                ],
-                messages: [
-                {
-                    id: 1,
-                    body: 'Hola, necesito ayuda',
-                    created_at: '2026-03-31T10:00:00.000000Z',
-                    sender: {
-                    id: 1,
-                    name: 'César',
-                    email: 'cesar@test.com',
+        mockedUseConversationDetail.mockImplementation((conversationId: number | null) => {
+            if (conversationId === 2) {
+                return {
+                    conversation: {
+                        id: 2,
+                        subject: 'Factura pendiente',
+                        status: 'closed',
+                        participants: [
+                            { id: 1, name: 'César', email: 'cesar@test.com' },
+                            { id: 2, name: 'Ana', email: 'ana@test.com' },
+                        ],
+                        messages: [
+                            {
+                                id: 2,
+                                body: 'La factura ya fue enviada',
+                                created_at: '2026-03-30T10:00:00.000000Z',
+                                sender: {
+                                    id: 2,
+                                    name: 'Ana',
+                                    email: 'ana@test.com',
+                                },
+                            },
+                        ],
                     },
+                    isLoading: false,
+                    error: null,
+                    reload: jest.fn(),
+                };
+            }
+
+            return {
+                conversation: {
+                    id: 1,
+                    subject: 'Soporte técnico',
+                    status: 'open',
+                    participants: [
+                        { id: 1, name: 'César', email: 'cesar@test.com' },
+                        { id: 2, name: 'Ana', email: 'ana@test.com' },
+                    ],
+                    messages: [
+                        {
+                            id: 1,
+                            body: 'Hola, necesito ayuda',
+                            created_at: '2026-03-31T10:00:00.000000Z',
+                            sender: {
+                                id: 1,
+                                name: 'César',
+                                email: 'cesar@test.com',
+                            },
+                        },
+                    ],
                 },
-                ],
-            },
-            isLoading: false,
-            error: null,
-            reload: jest.fn(),
+                isLoading: false,
+                error: null,
+                reload: jest.fn(),
+            };
         });
 
         mockedUseUnreadCount.mockReturnValue({
@@ -186,5 +217,15 @@ describe('InboxPage', () => {
         render(<InboxPage />);
 
         expect(screen.getByText('Hola, necesito ayuda')).toBeInTheDocument();
+    });
+
+    it('cambia el detalle al seleccionar otra conversación', () => {
+        render(<InboxPage />);
+
+        expect(screen.getByText('Hola, necesito ayuda')).toBeInTheDocument();
+
+        fireEvent.click(screen.getByText('Factura pendiente'));
+
+        expect(screen.getByText('La factura ya fue enviada')).toBeInTheDocument();
     });
 });
