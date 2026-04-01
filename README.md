@@ -1,3 +1,17 @@
-○ Instrucciones de instalación y ejecución.
-○ Descripción breve del enfoque utilizado y cualquier decisión técnica relevante.
-○ Capturas de pantalla o ejemplos si lo consideras necesario.
+Qué debes correr en tu máquina
+
+Dentro del proyecto:
+
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan jwt:secret
+touch database/database.sqlite
+php artisan migrate --seed
+npm install
+npm run dev
+
+
+Credenciales para login:
+email: "admin@messaging-inbox.com"
+password: "password123"

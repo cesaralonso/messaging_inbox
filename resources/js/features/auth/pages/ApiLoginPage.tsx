@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { useState } from 'react';
 import { useApiLogin } from '@/features/auth/hooks/useApiLogin';
+import InboxShellLayout from '@/layouts/inbox-shell-layout';
 
 export default function ApiLoginPage() {
     const { login, isLoading, error } = useApiLogin();
@@ -15,31 +16,26 @@ export default function ApiLoginPage() {
             await login({ email, password });
             window.location.href = '/inbox';
         } catch {
-            // el error ya se refleja en pantalla
+            //
         }
     };
 
     return (
-        <>
+        <InboxShellLayout> <>
             <Head title="API Login" />
 
-            <div className="mx-auto mt-16 max-w-md rounded-2xl border bg-white p-6 shadow-sm dark:bg-neutral-900">
-                <div className="mb-6">
-                    <p className="text-xs font-medium uppercase tracking-[0.2em] text-neutral-500">
-                        JWT + Inertia
-                    </p>
-                    <h1 className="mt-2 text-2xl font-semibold">API Login</h1>
-                    <p className="mt-2 text-sm text-neutral-500">
-                        Inicia sesión con el guard API para abrir el inbox sin usar la sesión web de Laravel.
-                    </p>
-                </div>
+            <div className="mx-auto mt-16 max-w-md rounded-xl border bg-white p-6 shadow-sm dark:bg-neutral-900">
+                <h1 className="text-xl font-semibold">API Login</h1>
+                <p className="mt-1 text-sm text-neutral-500">
+                    Inicia sesión con JWT para usar el inbox.
+                </p>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                     <div>
                         <label className="mb-1 block text-sm font-medium">Email</label>
                         <input
                             type="email"
-                            className="w-full rounded-lg border px-3 py-2 text-sm"
+                            className="w-full rounded-md border px-3 py-2 text-sm"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
@@ -49,14 +45,10 @@ export default function ApiLoginPage() {
                         <label className="mb-1 block text-sm font-medium">Password</label>
                         <input
                             type="password"
-                            className="w-full rounded-lg border px-3 py-2 text-sm"
+                            className="w-full rounded-md border px-3 py-2 text-sm"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
-                    </div>
-
-                    <div className="rounded-lg border bg-neutral-50 p-3 text-xs text-neutral-600 dark:bg-neutral-950/40">
-                        Demo seed: <strong>admin@messaging-inbox.com</strong> / <strong>123456</strong>
                     </div>
 
                     {error && <p className="text-sm text-red-600">{error}</p>}
@@ -64,12 +56,13 @@ export default function ApiLoginPage() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full rounded-lg bg-black px-4 py-2.5 text-sm text-white disabled:opacity-50"
+                        className="w-full rounded-md bg-black px-4 py-2 text-sm text-white disabled:opacity-50"
                     >
-                        {isLoading ? 'Ingresando...' : 'Ingresar al inbox'}
+                        {isLoading ? 'Ingresando...' : 'Ingresar'}
                     </button>
                 </form>
             </div>
         </>
+        </InboxShellLayout>
     );
 }

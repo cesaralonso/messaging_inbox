@@ -1,54 +1,40 @@
-import type { ComponentType } from 'react';
+import React from 'react';
 import { createInertiaApp } from '@inertiajs/react';
+import { createRoot } from 'react-dom/client';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
-import AppLayout from '@/layouts/app-layout';
-import AuthLayout from '@/layouts/auth-layout';
-import SettingsLayout from '@/layouts/settings/layout';
+
+type PageModule = {
+    default: React.ComponentType<any>;
+};
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-type InertiaPageModule = {
-    default: ComponentType<any>;
-};
-
-const pages = import.meta.glob<InertiaPageModule>('./pages/**/*.tsx', {
-    eager: true,
-});
+const pages = import.meta.glob<PageModule>([
+    './pages/**/*.tsx',
+    '!./pages/settings/**/*.tsx',
+]);
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
 
-    resolve: (name) => {
-        const page = pages[`./pages/${name}.tsx`];
+    resolve: async (name) => {
+        const importPage = pages[`./pages/${name}.tsx`];
 
-        if (!page) {
-            throw new Error(`Page not found: ./pages/${name}.tsx`);
+        if (!importPage) {
+            throw new Error(`Page not found: ${name}`);
         }
 
-        return page;
+        const page = await importPage();
+        return page.default;
     },
 
-    layout: (name) => {
-        if (name === 'welcome') {
-            return null;
-        }
-
-        if (name.startsWith('auth/')) {
-            return AuthLayout;
-        }
-
-        if (name.startsWith('settings/')) {
-            return [AppLayout, SettingsLayout];
-        }
-
-        return AppLayout;
-    },
-
-    strictMode: true,
-
-    withApp(app) {
-        return <TooltipProvider delayDuration={0}>{app}</TooltipProvider>;
+    setup({ el, App, props }) {
+        createRoot(el).render(
+            <TooltipProvider delayDuration={0}>
+                <App {...props} />
+            </TooltipProvider>
+        );
     },
 
     progress: {

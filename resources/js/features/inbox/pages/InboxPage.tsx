@@ -6,6 +6,8 @@ import { useConversationDetail } from '@/features/inbox/hooks/useConversationDet
 import { useConversations } from '@/features/inbox/hooks/useConversations';
 import { useReplyToConversation } from '@/features/inbox/hooks/useReplyToConversation';
 import { useUnreadCount } from '@/features/inbox/hooks/useUnreadCount';
+import InboxShellLayout from '@/layouts/inbox-shell-layout';
+
 
 export default function InboxPage() {
     const hydrateFromStorage = useApiAuthStore((s) => s.hydrateFromStorage);
@@ -88,6 +90,7 @@ export default function InboxPage() {
 
     if (!isAuthenticated) {
         return (
+        <InboxShellLayout>
             <>
                 <Head title="Inbox" />
                 <div className="mx-auto max-w-xl p-6">
@@ -106,6 +109,7 @@ export default function InboxPage() {
                     </div>
                 </div>
             </>
+        </InboxShellLayout>
         );
     }
 

@@ -1,17 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
+use Inertia\Inertia;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
-
-Route::inertia('/api-login', 'api-login')->name('api-login');
-Route::inertia('/inbox', 'inbox')->name('inbox');
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+Route::get('/', function () {
+    return redirect()->route('inbox');
 });
 
-require __DIR__.'/settings.php';
+Route::get('/api-login', function () {
+    return Inertia::render('api-login');
+})->name('api-login');
+
+Route::get('/inbox', function () {
+    return Inertia::render('inbox');
+})->name('inbox');
+
+Route::get('/dashboard', function () {
+    return Inertia::render('dashboard');
+})->middleware(['auth'])->name('dashboard');
