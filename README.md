@@ -1,9 +1,29 @@
 # MiInbox
 ## Messaging Inbox
 
-Aplicación web full stack desarrollada con Laravel + Inertia + React + Vite, que implementa un sistema de mensajería interna con autenticación mediante JWT.
+Aplicación web full stack desarrollada con Laravel + Inertia + React + Vite y Tailwind, que implementa un sistema de mensajería interna con autenticación mediante JWT.
 
----
+## Requisitos cubiertos
+- JWT auth
+- usuario actual
+- listado de conversaciones con paginación, búsqueda y filtro por estado
+- detalle de conversación con mensajes
+- creación de conversación con primer mensaje
+- respuesta a conversación
+- contador de no leídos
+- tests backend con PHPUnit
+- tests frontend con Jest + React Testing Library
+
+## Ejecución
+
+### Backend
+php artisan serve
+
+### Frontend
+npm install
+npm run dev
+
+
 
 ## Descripción
 
@@ -189,7 +209,7 @@ php artisan serve
 
 ---
 
-## Tests
+## Tests backend
 
 php artisan test  
 
@@ -200,6 +220,12 @@ Se eliminaron tests del starter original que no corresponden al alcance actual d
 - inbox
 - conversaciones
 - mensajes
+
+
+## Tests frontend
+npm test
+
+
 
 ---
 
@@ -219,7 +245,6 @@ Se eliminaron tests del starter original que no corresponden al alcance actual d
 - Adjuntar archivos
 - Notificaciones en tiempo real
 - Paginación avanzada
-- Tests para creación de conversaciones
 
 ---
 
