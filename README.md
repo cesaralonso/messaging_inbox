@@ -1,333 +1,238 @@
-# Messaging Inbox
+# MiInbox
+## Messaging Inbox
 
-Aplicación full stack construida con **Laravel + Inertia + React + Vite**, enfocada en un flujo de mensajería interna con autenticación JWT e interfaz de inbox.
-
-## Objetivo
-
-Esta práctica implementa un inbox funcional con:
-
-- login por API usando JWT
-- listado de conversaciones
-- vista de detalle de conversación
-- respuesta a mensajes
-- contador de no leídos
-- creación de nuevas conversaciones
-- interfaz moderna con layout propio
-
-Además, se integró correctamente **Inertia + Vite** evitando conflictos con páginas starter que no formaban parte del alcance real de la práctica.
+Aplicación web full stack desarrollada con Laravel + Inertia + React + Vite, que implementa un sistema de mensajería interna con autenticación mediante JWT.
 
 ---
 
-## Stack
+## Descripción
+
+Messaging Inbox permite a los usuarios autenticarse mediante API y gestionar conversaciones en una interfaz tipo inbox:
+
+- Login con JWT
+- Listado de conversaciones
+- Vista de detalle
+- Respuesta de mensajes
+- Contador de no leídos
+- Creación de nuevas conversaciones
+- Interfaz moderna desacoplada del starter de Laravel
+
+---
+
+## Stack Tecnológico
 
 ### Backend
 - Laravel
 - PHP
-- SQLite o MySQL
+- MySQL
 - JWT Auth
 - Eloquent ORM
 
 ### Frontend
-- React
+- React + TypeScript
 - Inertia.js
 - Vite
-- TypeScript
 - Tailwind CSS
 - Lucide React
 
 ---
 
-## Flujo principal del sistema
+## Flujo de la aplicación
 
-### 1. Login API
-El usuario entra por:
+1. El usuario accede a /api-login
+2. Se autentica contra la API (JWT)
+3. Se almacena el token en frontend
+4. Se accede a /inbox
+5. Se consumen endpoints protegidos para:
+   - listar conversaciones
+   - ver mensajes
+   - responder
+   - crear nuevas conversaciones
 
-```bash
-/api-login
+---
 
+## Rutas principales
 
-Desde esa pantalla se autentica contra el backend JWT.
+### Web
 
+/              -> redirige a /home  
+/home          -> redirige a /inbox  
+/api-login     -> login JWT  
+/inbox         -> inbox principal  
+/dashboard     -> vista protegida  
 
-### 2. Persistencia de sesión
+---
 
-Al autenticarse:
+### API
 
-se obtiene el token JWT
-se guarda en frontend
-se hidrata sesión desde storage
-posteriormente se consume la API protegida
+POST   /api/auth/login  
+GET    /api/users  
 
-### 3. Inbox
+GET    /api/conversations  
+POST   /api/conversations  
+GET    /api/conversations/unread-count  
+GET    /api/conversations/{id}  
+PATCH  /api/conversations/{id}/read  
+POST   /api/conversations/{id}/messages  
 
-El usuario entra a:
+---
 
-/inbox
+## Estructura del frontend
 
-y puede:
-
-ver conversaciones
-consultar detalle
-responder mensajes
-marcar como leído
-crear una nueva conversación
-
-## Rutas web principales
-/              -> redirige a /home
-/home          -> redirige a /inbox
-/dashboard     -> página Inertia protegida
-/api-login     -> login por API/JWT
-/inbox         -> inbox principal
-Rutas API principales
-Auth
-POST /api/auth/login
-Usuarios
-GET /api/users
-Conversaciones
-GET    /api/conversations
-POST   /api/conversations
-GET    /api/conversations/unread-count
-GET    /api/conversations/{conversation}
-PATCH  /api/conversations/{conversation}/read
-POST   /api/conversations/{conversation}/messages
-
-## Estructura relevante del frontend
 resources/js/
-├── app.tsx
-├── layouts/
-│   └── inbox-shell-layout.tsx
-├── pages/
-│   ├── api-login.tsx
-│   ├── inbox.tsx
-│   └── dashboard.tsx
-└── features/
-    ├── auth/
-    │   ├── hooks/
-    │   ├── pages/
-    │   │   └── ApiLoginPage.tsx
-    │   └── store/
-    └── inbox/
-        ├── api/
-        ├── hooks/
-        ├── pages/
-        │   └── InboxPage.tsx
-        └── types/
+- app.tsx
+- layouts/
+  - inbox-shell-layout.tsx
+- pages/
+  - api-login.tsx
+  - inbox.tsx
+  - dashboard.tsx
+- features/
+  - auth/
+  - inbox/
 
-### Punto importante sobre Inertia + Vite
+---
 
-Se corrigió el problema de integración evitando que Vite intentara compilar páginas starter no utilizadas, especialmente las de:
+## UI del Inbox
 
-resources/js/pages/settings/*
+Layout principal:
+- Header superior con navegación
+- Buscador global
+- Botón "Nuevo mensaje"
 
-La resolución de páginas Inertia quedó enfocada únicamente en las páginas reales del proyecto.
+Panel izquierdo:
+- Lista de conversaciones
+- Búsqueda
+- Indicador de no leídos
 
-Wrapper pages usadas por Inertia
+Panel derecho:
+- Detalle de conversación
+- Historial de mensajes
+- Área de respuesta
 
-Se usan páginas wrapper en:
+Modal:
+- Creación de nueva conversación
+- Selección de usuario
+- Asunto y mensaje
 
-resources/js/pages/api-login.tsx
-resources/js/pages/inbox.tsx
+---
 
-Estas exportan las páginas reales dentro de features.
+## Credenciales de prueba
 
+Email: admin@messaging-inbox.com  
+Password: 123456  
 
-### Layout del inbox
+---
 
-Se creó un layout propio para el sistema:
+## Instalación
 
-resources/js/layouts/inbox-shell-layout.tsx
+### 1. Clonar repositorio
 
-
-## Este layout incorpora:
-
-encabezado superior
-buscador visual
-navegación principal
-botón “Nuevo mensaje”
-estructura visual alineada al mockup solicitado
-Inbox UI implementado
-
-
-## La pantalla de inbox incluye:
-
-Panel izquierdo
-listado de conversaciones
-búsqueda
-badge de no leídos
-botón de nuevo mensaje
-Panel derecho
-encabezado de conversación
-lectura del historial
-textarea para responder
-acción de envío
-Modal de creación
-destinatario
-asunto
-cuerpo del mensaje
-Login de prueba
-
-
-## Credenciales de prueba:
-
-Email: admin@messaging-inbox.com
-Password: 123456
-
-### Instalación
-1. Clonar proyecto
 git clone <repo-url>
 cd messaging-inbox
 
-### 2. Instalar dependencias backend
-composer install
+### 2. Backend
 
-### 3. Instalar dependencias frontend
-npm install
+composer install  
+cp .env.example .env  
+php artisan key:generate  
+php artisan jwt:secret  
 
-### 4. Configurar entorno
-cp .env.example .env
-php artisan key:generate
-php artisan jwt:secret
+### 3. Base de datos (MySQL)
 
-### 5. Base de datos
+Crear base de datos:
 
+CREATE DATABASE messaging_inbox;
 
-### Si usas SQLite:
-touch database/database.sqlite
-Asegúrate de configurar en .env:
-DB_CONNECTION=
-DB_DATABASE=
+Configurar .env:
 
-Después:
+DB_CONNECTION=mysql  
+DB_HOST=127.0.0.1  
+DB_PORT=3306  
+DB_DATABASE=messaging_inbox  
+DB_USERNAME=root  
+DB_PASSWORD=  
 
-php artisan migrate --seed
+Migrar:
 
-### Ejecución en desarrollo
-Terminal 1
-npm run dev
-Terminal 2
-php artisan serve
+php artisan migrate --seed  
 
-Abrir:
+---
 
-http://127.0.0.1:8000/api-login
-http://127.0.0.1:8000/inbox
+### 4. Frontend
 
-### Build de producción
-php artisan optimize:clear
-rm -rf public/build
-rm -f public/hot
-npm run build
-php artisan serve
+npm install  
 
-### Tests
+---
 
-Ejecutar:
+## Ejecución
 
-php artisan test
+### Desarrollo
 
-## Nota importante sobre los tests
+npm run dev  
+php artisan serve  
 
-Durante la integración real del proyecto se eliminaron algunos tests heredados del starter original de Laravel porque ya no correspondían al alcance funcional de esta práctica.
+Acceder a:
 
-En particular, se descartaron pruebas relacionadas con módulos starter no implementados actualmente, como:
+http://127.0.0.1:8000/api-login  
+http://127.0.0.1:8000/inbox  
 
-perfil completo de usuario del starter
-seguridad del starter
-ejemplos base que dependían de rutas no usadas por la práctica real
+---
 
+### Producción
 
-### Se conservaron y ajustaron las pruebas relevantes para:
+php artisan optimize:clear  
+rm -rf public/build  
+rm -f public/hot  
+npm run build  
+php artisan serve  
 
-autenticación
-JWT login
-dashboard
-conversaciones
-mensajes
-lectura / no leídos
+---
 
-### Decisiones técnicas tomadas
-1. Se mantuvo el flujo JWT separado del auth web tradicional
+## Tests
 
-/api-login autentica contra API y /inbox consume endpoints protegidos vía token.
+php artisan test  
 
-2. Se desacopló el inbox del starter visual de Laravel
+Nota:
+Se eliminaron tests del starter original que no corresponden al alcance actual del proyecto (profile, security, etc.), manteniendo únicamente los relevantes para:
 
-Se creó un layout propio en lugar de depender del layout original del starter.
+- autenticación
+- inbox
+- conversaciones
+- mensajes
 
-3. Se corrigió el resolve de Inertia
+---
 
-Se evitó el bucle de errores de tipado y compilación ajustando correctamente la resolución de páginas reales.
+## Consideraciones técnicas
 
-4. Se evitó compilar páginas starter no utilizadas
+- Se desacopló el layout del starter de Laravel
+- Se resolvieron conflictos de Vite/Inertia evitando cargar páginas no utilizadas
+- Se implementó autenticación JWT independiente del auth tradicional
+- Se utilizaron wrappers en /pages para compatibilidad con Inertia
 
-Esto resolvió errores de build por imports inexistentes en módulos legacy de settings.
+---
 
+## Próximos pasos
 
+- Mostrar fechas reales en mensajes
+- Autocomplete en destinatarios
+- Adjuntar archivos
+- Notificaciones en tiempo real
+- Paginación avanzada
+- Tests para creación de conversaciones
 
-#To - do
-mostrar fecha y hora real del último mensaje
-crear conversación con autocomplete de usuarios
-agregar estados de conversación
-mejorar paginación del inbox
-agregar modal de confirmación para cerrar conversación
-agregar tests del flujo “nuevo mensaje”
-agregar notificaciones toast
-soportar archivos adjuntos
-
-## Comandos útiles
-
-### Limpiar caché
-php artisan optimize:clear
-
-### Ver rutas
-php artisan route:list
-
-### Ejecutar tests
-php artisan test
-
-### Build frontend
-npm run build
-
-### Desarrollo frontend
-npm run dev
+---
 
 ## Estado actual
 
-### Proyecto funcional con:
+- Login JWT funcional
+- Inbox completamente funcional
+- UI moderna implementada
+- Integración Inertia + Vite estable
+- Tests ajustados al alcance real
 
-Inertia + React + Vite funcionando
-login JWT funcionando
-inbox principal funcionando
-detalle y reply funcionando
-creación de conversación lista para seguir refinando
-test suite ajustada al alcance real del proyecto
+---
 
+## Autor
 
-
-
-
-
-
-##Dentro del proyecto:
-composer install
-cp .env.example .env
-php artisan key:generate
-php artisan jwt:secret
-php artisan migrate --seed
-npm install
-npm run dev
-
-##Credenciales para login:
-email: "admin@messaging-inbox.com"
-password: "123456"
-
-##Limpieza:
-php artisan optimize:clear
-rm -rf public/build
-rm -f public/hot
-npm run build
-
-##Despues de cambios:
-npm run build
-php artisan optimize:clear
-php artisan serve
+Desarrollado como práctica técnica full stack.
