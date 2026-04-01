@@ -226,6 +226,8 @@ describe('InboxPage', () => {
 
         fireEvent.click(screen.getByText('Factura pendiente'));
 
-        expect(screen.getByText('La factura ya fue enviada')).toBeInTheDocument();
-    });
+        expect(
+            screen.getAllByText('La factura ya fue enviada')
+            ).toHaveLength(2);
+        });
 });
