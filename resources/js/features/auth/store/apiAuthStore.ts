@@ -5,6 +5,7 @@ interface ApiAuthState {
   user: AuthUser | null;
   token: string | null;
   isAuthenticated: boolean;
+  hydrated: boolean;
   setSession: (user: AuthUser, token: string) => void;
   clearSession: () => void;
   hydrateFromStorage: () => void;
@@ -14,6 +15,7 @@ export const useApiAuthStore = create<ApiAuthState>((set) => ({
   user: null,
   token: null,
   isAuthenticated: false,
+  hydrated: false,
 
   setSession: (user, token) => {
     localStorage.setItem('api_token', token);
@@ -23,6 +25,7 @@ export const useApiAuthStore = create<ApiAuthState>((set) => ({
       user,
       token,
       isAuthenticated: true,
+      hydrated: true,
     });
   },
 
@@ -34,6 +37,7 @@ export const useApiAuthStore = create<ApiAuthState>((set) => ({
       user: null,
       token: null,
       isAuthenticated: false,
+      hydrated: true,
     });
   },
 
@@ -42,6 +46,7 @@ export const useApiAuthStore = create<ApiAuthState>((set) => ({
     const userRaw = localStorage.getItem('api_user');
 
     if (!token || !userRaw) {
+      set({ hydrated: true });
       return;
     }
 
@@ -52,10 +57,17 @@ export const useApiAuthStore = create<ApiAuthState>((set) => ({
         user,
         token,
         isAuthenticated: true,
+        hydrated: true,
       });
     } catch {
       localStorage.removeItem('api_token');
       localStorage.removeItem('api_user');
+      set({
+        user: null,
+        token: null,
+        isAuthenticated: false,
+        hydrated: true,
+      });
     }
   },
 }));

@@ -6,13 +6,30 @@ import type {
   PaginationMeta,
 } from '../types/inbox.types';
 
-export function useConversations(params: ConversationQueryParams) {
+interface UseConversationsOptions {
+  enabled?: boolean;
+}
+
+export function useConversations(
+  params: ConversationQueryParams,
+  options: UseConversationsOptions = {}
+) {
+  const { enabled = true } = options;
+
   const [items, setItems] = useState<ConversationListItem[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
+    if (!enabled) {
+      setItems([]);
+      setMeta(null);
+      setError(null);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -30,7 +47,7 @@ export function useConversations(params: ConversationQueryParams) {
 
   useEffect(() => {
     void load();
-  }, [params.search, params.status, params.page, params.per_page]);
+  }, [enabled, params.search, params.status, params.page, params.per_page]);
 
   return {
     items,

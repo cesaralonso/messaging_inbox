@@ -2,14 +2,25 @@ import { useEffect, useState } from 'react';
 import { conversationsApi } from '../api/conversationsApi';
 import type { ConversationDetail } from '../types/inbox.types';
 
-export function useConversationDetail(conversationId: number | null) {
+interface UseConversationDetailOptions {
+  enabled?: boolean;
+}
+
+export function useConversationDetail(
+  conversationId: number | null,
+  options: UseConversationDetailOptions = {}
+) {
+  const { enabled = true } = options;
+
   const [conversation, setConversation] = useState<ConversationDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
-    if (!conversationId) {
+    if (!enabled || !conversationId) {
       setConversation(null);
+      setError(null);
+      setIsLoading(false);
       return;
     }
 
@@ -29,7 +40,7 @@ export function useConversationDetail(conversationId: number | null) {
 
   useEffect(() => {
     void load();
-  }, [conversationId]);
+  }, [enabled, conversationId]);
 
   return {
     conversation,

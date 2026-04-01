@@ -1,11 +1,23 @@
 import { useEffect, useState } from 'react';
 import { conversationsApi } from '../api/conversationsApi';
 
-export function useUnreadCount() {
+interface UseUnreadCountOptions {
+  enabled?: boolean;
+}
+
+export function useUnreadCount(options: UseUnreadCountOptions = {}) {
+  const { enabled = true } = options;
+
   const [count, setCount] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
   const load = async () => {
+    if (!enabled) {
+      setCount(0);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -20,7 +32,7 @@ export function useUnreadCount() {
 
   useEffect(() => {
     void load();
-  }, []);
+  }, [enabled]);
 
   return {
     count,
