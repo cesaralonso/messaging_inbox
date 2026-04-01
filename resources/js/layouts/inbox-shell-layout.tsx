@@ -7,7 +7,14 @@ const navItems = [
     { label: 'API Login', href: '/api-login', icon: KeyRound },
 ];
 
-export default function InboxShellLayout({ children }: PropsWithChildren) {
+type InboxShellLayoutProps = PropsWithChildren<{
+    onNewMessage?: () => void;
+}>;
+
+export default function InboxShellLayout({
+    children,
+    onNewMessage,
+}: InboxShellLayoutProps) {
     const page = usePage();
 
     return (
@@ -41,6 +48,7 @@ export default function InboxShellLayout({ children }: PropsWithChildren) {
 
                             <button
                                 type="button"
+                                onClick={onNewMessage}
                                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-slate-800"
                             >
                                 <SquarePen className="h-4 w-4" />

@@ -4,8 +4,16 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return redirect()->route('inbox');
+    return redirect()->route('home');
 });
+
+Route::get('/home', function () {
+    return redirect()->route('inbox');
+})->name('home');
+
+Route::get('/dashboard', function () {
+    return Inertia::render('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/api-login', function () {
     return Inertia::render('api-login');
@@ -15,6 +23,4 @@ Route::get('/inbox', function () {
     return Inertia::render('inbox');
 })->name('inbox');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('dashboard');
-})->middleware(['auth'])->name('dashboard');
+require __DIR__.'/settings.php';

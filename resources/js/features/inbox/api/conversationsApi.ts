@@ -6,6 +6,7 @@ import type {
   ReplyPayload,
   UnreadCountResponse,
   ConversationQueryParams,
+  InboxUsersResponse,
 } from '../types/inbox.types';
 
 function toQueryString(params: ConversationQueryParams = {}): string {
@@ -34,6 +35,10 @@ export const conversationsApi = {
       `/conversations/${conversationId}`,
       true
     );
+  },
+
+  users() {
+    return apiClient.get<InboxUsersResponse>('/users', true);
   },
 
   create(payload: CreateConversationPayload) {

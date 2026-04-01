@@ -71,3 +71,13 @@ export interface ConversationQueryParams {
   page?: number;
   per_page?: number;
 }
+
+export interface InboxUserOption {
+  id: number;
+  name: string;
+  email: string;
+}
+
+export interface InboxUsersResponse {
+  data: InboxUserOption[];
+}
